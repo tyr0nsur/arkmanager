@@ -1,0 +1,46 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const jwt = require('jsonwebtoken');
+
+test('Discord-only access supports invitations, roles and immediate revocation', async t => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'obelisk-discord-admins-'));
+    await fs.chmod(root, 0o700);
+    const adminsFile = path.join(root, 'admins.json');
+    const secret = 'fixture-session-secret-at-least-32-characters';
+    await fs.writeFile(adminsFile, JSON.stringify([{ id: 'owner', username: 'owner', role: 'owner', discordId: '100000000000000001', sessionVersion: 0 }]));
+    await fs.writeFile(path.join(root, 'nodes.json'), '[]');
+    Object.assign(process.env, { NODE_ENV: 'test', DASHBOARD_DATA_DIR: root, JWT_SECRET_KEY: secret,
+        OBELISK_OIDC_CONFIG_FILE: path.join(root, 'oidc.json'), PORT: '0' });
+    const server = require('../server').startServer(0);
+    await new Promise(resolve => server.once('listening', resolve));
+    t.after(async () => { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await fs.rm(root, { recursive: true, force: true }); });
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const cookie = (id, authProvider = 'discord', sessionVersion = 0) => 'session=' + jwt.sign({ id, authProvider, sessionVersion }, secret, { algorithm: 'HS256' });
+    const request = (route, method = 'GET', body, auth = cookie('owner')) => fetch(base + route, { method, headers: { cookie: auth + '; XSRF-TOKEN=fixture-csrf', 'x-xsrf-token': 'fixture-csrf', 'content-type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}) });
+    assert.equal((await request('/api/auth/login', 'POST', { username: 'owner', password: 'irrelevant' })).status, 410);
+    assert.equal((await request('/api/auth/password', 'POST', { currentPassword: 'irrelevant', newPassword: 'irrelevant-password' })).status, 410);
+    assert.equal((await request('/api/admins', 'GET', null, cookie('owner', 'local'))).status, 403);
+    assert.equal((await request('/api/admins', 'POST', { username: 'invalid', discordId: 100000000000000001, role: 'owner' })).status, 400, 'IDs must remain strings without numeric precision loss');
+    const invite = { username: 'invited-operator', discordId: '123456789012345678', role: 'operator' };
+    assert.equal((await request('/api/admins', 'POST', invite)).status, 200);
+    assert.equal((await request('/api/admins', 'POST', { ...invite, username: 'another-alias' })).status, 400);
+    const accounts = await (await request('/api/admins')).json();
+    const invited = accounts.find(admin => admin.discordId === invite.discordId);
+    assert.equal(invited.status, 'invited');
+    const stored = JSON.parse(await fs.readFile(adminsFile, 'utf8')).find(admin => admin.id === invited.id);
+    assert.equal(Object.hasOwn(stored, 'password'), false);
+    const invitedCookie = cookie(invited.id);
+    assert.equal((await request('/api/admins', 'GET', null, invitedCookie)).status, 403, 'operators cannot grant access');
+    assert.equal((await request('/api/auth/verify', 'GET', null, invitedCookie)).status, 200);
+    assert.equal((await request('/api/admins/' + invited.id, 'PATCH', { discordId: '100000000000000005' })).status, 400);
+    assert.equal((await request('/api/admins/' + invited.id, 'PATCH', { role: 'viewer', confirmation: 'ROL invited-operator' })).status, 200);
+    assert.equal((await request('/api/auth/verify', 'GET', null, invitedCookie)).status, 401, 'role changes invalidate old sessions');
+    const viewerCookie = cookie(invited.id, 'discord', 1);
+    assert.equal((await request('/api/auth/verify', 'GET', null, viewerCookie)).status, 200);
+    assert.equal((await request('/api/admins/' + invited.id, 'DELETE', { confirmation: invite.username })).status, 200);
+    assert.equal((await request('/api/auth/verify', 'GET', null, viewerCookie)).status, 401, 'revocation invalidates existing sessions');
+    assert.equal((await request('/api/admins/owner', 'DELETE', { confirmation: 'owner' })).status, 400);
+});

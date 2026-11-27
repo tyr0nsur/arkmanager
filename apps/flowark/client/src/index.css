@@ -1,0 +1,336 @@
+@import "tailwindcss";
+
+/* ============================================
+   ARKMANAGER - SOFT MODERN THEME
+   ============================================ */
+
+:root {
+  color-scheme: dark;
+
+  /* Soft Color Palette (Zinc / Slate based) */
+  --bg-void: #0e0e11;      /* Very soft dark */
+  --bg-base: #131316;      /* Main background */
+  --bg-surface: #18181c;   /* Slightly lighter */
+  --bg-card: #1c1c21;      /* Cards and modals */
+  --bg-hover: #232329;     /* Soft hover state */
+
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.03);
+  --border-default: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+
+  /* Soft Accents (Pastel Indigo / Blue) */
+  --accent: #818cf8;
+  --accent-soft: rgba(129, 140, 248, 0.1);
+  --accent-hover: rgba(129, 140, 248, 0.15);
+
+  /* Text */
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   BASE RESET
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dashboard-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-shell {
+    height: 100vh;
+    height: 100dvh;
+  }
+}
+
+/* ============================================
+   SOFT SCROLLBAR
+   ============================================ */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================
+   OPERATIONAL TOASTS
+   ============================================ */
+.dashboard-toaster[data-sonner-toaster] {
+  z-index: 130 !important;
+  --width: min(22rem, calc(100vw - 2rem));
+}
+
+.dashboard-toaster .dashboard-toast {
+  position: relative;
+  display: grid;
+  width: min(22rem, calc(100vw - 2rem));
+  min-height: 3.25rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.625rem;
+  padding: 0.75rem 2.25rem 0.75rem 0.875rem;
+  border: 1px solid rgba(63, 63, 70, 0.86);
+  border-radius: 0.5rem;
+  background: rgba(24, 24, 27, 0.98);
+  color: rgb(244, 244, 245);
+  box-shadow: 0 18px 45px -24px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-toaster .dashboard-toast-success {
+  border-color: rgba(16, 185, 129, 0.34);
+  background: linear-gradient(90deg, rgba(6, 78, 59, 0.82), rgba(24, 24, 27, 0.98) 38%);
+}
+
+.dashboard-toaster .dashboard-toast-error {
+  border-color: rgba(248, 113, 113, 0.36);
+  background: linear-gradient(90deg, rgba(127, 29, 29, 0.82), rgba(24, 24, 27, 0.98) 38%);
+}
+
+.dashboard-toaster .dashboard-toast-warning {
+  border-color: rgba(245, 158, 11, 0.38);
+  background: linear-gradient(90deg, rgba(120, 53, 15, 0.82), rgba(24, 24, 27, 0.98) 38%);
+}
+
+.dashboard-toaster .dashboard-toast-info {
+  border-color: rgba(34, 211, 238, 0.34);
+  background: linear-gradient(90deg, rgba(22, 78, 99, 0.82), rgba(24, 24, 27, 0.98) 38%);
+}
+
+.dashboard-toaster .dashboard-toast-icon {
+  display: flex;
+  min-width: 1rem;
+  transform: translateY(0.125rem);
+}
+
+.dashboard-toaster .dashboard-toast-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.dashboard-toaster .dashboard-toast-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  color: rgb(250, 250, 250);
+}
+
+.dashboard-toaster .dashboard-toast-description {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(161, 161, 170);
+}
+
+.dashboard-toaster .dashboard-toast-close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: inline-flex;
+  height: 1.35rem;
+  width: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(82, 82, 91, 0.9);
+  border-radius: 0.375rem;
+  background: rgba(9, 9, 11, 0.9);
+  color: rgb(212, 212, 216);
+  cursor: pointer;
+}
+
+.dashboard-toaster .dashboard-toast-close:hover {
+  border-color: rgba(113, 113, 122, 0.95);
+  background: rgba(39, 39, 42, 0.95);
+}
+
+@media (max-width: 600px) {
+  .dashboard-toaster .dashboard-toast {
+    width: calc(100vw - 2rem);
+  }
+}
+
+/* ============================================
+   SOFT ANIMATIONS
+   ============================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.animate-slideIn {
+  animation: slideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ============================================
+   REFINED INPUTS & RANGE
+   ============================================ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--border-hover);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+  outline: none;
+}
+
+/* Minimal Selection */
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ============================================
+   SOFT CARDS
+   ============================================ */
+.soft-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.soft-card:hover {
+  border-color: var(--border-hover);
+}
+
+.dashboard-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Status dots */
+.status-online {
+  background: #34d399;
+}
+.status-offline {
+  background: #f87171;
+}
+
+/* Soft Buttons */
+.btn-soft {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.btn-soft:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+/* CSP-friendly progress bars: use attributes instead of inline width styles. */
+.flow-progress {
+  width: 100%;
+  height: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+}
+
+.flow-progress::-webkit-progress-bar {
+  background: transparent;
+}
+
+.flow-progress::-webkit-progress-value {
+  background: currentColor;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.flow-progress::-moz-progress-bar {
+  background: currentColor;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+/* xterm ships its own stylesheet; these first-party overrides keep terminals
+   visually integrated without requiring inline <style> blocks in the CSP. */
+.xterm-viewport {
+  background-color: #09090b !important;
+}
+
+.xterm .xterm-scroll-area {
+  background-color: transparent !important;
+}
+
+/* ObeliskPanel workspace. Persistent cluster navigation and scoped map tools. */
+.obelisk-app { background:var(--bg-void); }
+.obelisk-app .dashboard-card { box-shadow:none; border-color:var(--border-hover); background:var(--bg-surface); }
+.panel-context { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; flex-shrink:0; gap:.6rem 1rem; padding:.15rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid var(--border-hover); }
+.panel-context-path { display:flex; align-items:center; gap:.6rem; font-size:.75rem; color:var(--text-secondary); }
+.panel-context-path strong { color:var(--text-primary); font-weight:500; }
+.panel-context-scope { display:flex; align-items:center; flex-wrap:wrap; gap:.4rem; max-width:100%; font-size:.7rem; color:var(--text-secondary); }
+.panel-context-scope>span { max-width:15rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.panel-context-scope>svg { flex-shrink:0; margin-left:.5rem; color:#22d3ee; }
+.panel-context-warning { display:flex; align-items:center; gap:.5rem; flex-basis:100%; margin:0; font-size:.75rem; line-height:1.6; color:#fbbf24; }
+.obelisk-app :focus-visible { outline:2px solid #22d3ee; outline-offset:3px; }
+@media(max-width:640px) { .panel-context-scope>span { max-width:10rem; } .panel-context { gap:.65rem; padding-bottom:.75rem; margin-bottom:.75rem; } }
+@media(prefers-reduced-motion:reduce) { .obelisk-app *, .obelisk-app *::before, .obelisk-app *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }

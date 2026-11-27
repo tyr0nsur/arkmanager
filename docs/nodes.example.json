@@ -1,0 +1,14 @@
+[
+  {
+    "id": "example",
+    "name": "Example test map",
+    "host": "127.0.0.1",
+    "gamePort": 7777,
+    "queryPort": 27015,
+    "rconPort": 27020,
+    "script": "/opt/example-ark/arkserver",
+    "gameIni": "/opt/example-ark/serverfiles/ShooterGame/Saved/Config/LinuxServer/Game.ini",
+    "gameUserSettings": "/opt/example-ark/serverfiles/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini",
+    "logPath": "/opt/example-ark/serverfiles/ShooterGame/Saved/Logs/ShooterGame.log"
+  }
+]

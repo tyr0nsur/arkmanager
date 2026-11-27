@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-14",
+  "distribution": "private_research_only",
+  "purpose": "Functional requirements for source ports from ASE ArkApi to native Linux plugins",
+  "implementation_status": "requirements_only",
+  "windows_dll_binary_compatibility": false,
+  "full_functional_parity": false,
+  "public_api_extension_defined_here": false,
+  "upstream": {
+    "repository": "https://github.com/ArkServerApi/AseApi",
+    "commit": "f13b85979254b6b19c8d9255a0fc11c128978b8b",
+    "commit_date": "2025-04-30",
+    "official_resource_version_observed": "3.56",
+    "official_resource": "https://www.ark-server-api.com/resources/ase-server-api.32/",
+    "root_license_observed": "MIT",
+    "license_url": "https://github.com/ArkServerApi/AseApi/blob/f13b85979254b6b19c8d9255a0fc11c128978b8b/LICENSE",
+    "license_scope": "The root license does not establish licenses for arbitrary third-party plugins or dependencies"
+  },
+  "baseline": {
+    "preferred_plugin_boundary": "Versioned C POD and copied UTF-8 data",
+    "command_matching": "Legacy exact complete message; opt-in verb and ASCII-case source extension awaiting validation",
+    "reply_lifetime": "Current command invocation, owner and thread only",
+    "player_data": "Copied observations; no authentication, storefront assertion or durable session handle",
+    "timer_execution": "Worker thread; must not perform UE gameplay calls",
+    "operator_control": "Private local OS-authorized plane, separate from player commands",
+    "cooperative_unload": "Managed executable deliveries only; close admission, drain and clean before Shutdown and library close"
+  },
+  "priorities": {
+    "P0": "Migration foundation",
+    "P1": "Useful read-only commands and managed gameplay scheduling",
+    "P2": "Operator and persistent services",
+    "P3": "Native game mutation with separate proofs"
+  },
+  "domains": [
+    {
+      "id": "loading_abi_types",
+      "priority": "P0",
+      "status": "source_adaptation_required",
+      "requirements": [
+        "Recompile portable plugin source and dependencies as native Linux code",
+        "Adapt entry points and metadata to the runtime contract",
+        "Keep generated UE types and Windows field/native-call wrappers outside the plugin boundary",
+        "Specify encoding, ownership, limits and capability-dependent availability"
+      ],
+      "acceptance": ["Short or missing API slots reject safely", "Unsupported required operations reject Init", "No Windows DLL loading claim"]
+    },
+    {
+      "id": "callback_lifetime",
+      "priority": "P0",
+      "status": "managed_runtime_subset_available",
+      "requirements": ["Every executable delivery belongs to its load generation", "Unload failures preserve the mapped library", "No detached executable work under the managed-only declaration"],
+      "acceptance": ["Callbacks finish before data and code are released", "Stale generations cannot revive after address reuse", "Pause preserves registrations; reload uses explicit persisted state"]
+    },
+    {
+      "id": "configuration",
+      "priority": "P0",
+      "status": "init_paths_available_schema_adaptation_required",
+      "requirements": ["Copy borrowed Init paths before retaining them", "Map plugin-specific JSON schemas and instance ownership", "Use reviewed configuration migration instead of overwriting old state"],
+      "acceptance": ["Malformed config fails safely", "Separate instances keep distinct mutable state", "Config reload failure preserves the previous valid state"]
+    },
+    {
+      "id": "commands_and_replies",
+      "priority": "P1",
+      "status": "legacy_exact_available_options_source_pending_acceptance",
+      "requirements": ["Define argument tokenization, case policy, aliases and collisions", "Define command consumption and ordinary-chat behavior", "Retain scoped targeted reply and UTF-8 limits"],
+      "acceptance": ["Prefix collisions never execute the wrong command", "Arguments and malformed text follow the declared policy", "Two players receive only their own replies"]
+    },
+    {
+      "id": "outbound_chat",
+      "priority": "P1",
+      "status": "current_command_reply_only",
+      "requirements": ["Typed invalidatable destinations before deferred or broadcast sends", "Separate server messages, sender-labelled chat and notifications"],
+      "acceptance": ["Disconnected destinations reject delivery", "Reconnect does not revive an old destination", "The selected channel is visible in a real client"]
+    },
+    {
+      "id": "chat_observation_and_moderation",
+      "priority": "P1",
+      "status": "copied_text_seed_backend_dependent",
+      "requirements": ["Copy observed sender and command context where verified", "Treat suppression or rewrite as a separate policy contract with ordering"],
+      "acceptance": ["Normal chat remains functional", "Unknown sender fields stay unavailable", "Observer success is not reported as moderation success"]
+    },
+    {
+      "id": "timers_tick_and_game_thread",
+      "priority": "P1",
+      "status": "worker_timer_subset_only",
+      "requirements": ["Provide managed main-thread delivery for game work", "Define repeat counts, cadence, overrun, pause and cancellation rules", "Keep external I/O separate from UE execution"],
+      "acceptance": ["Game actions execute on the verified game thread", "Pause does not lose a due one-shot or replay an accidental burst", "No callback enters retired code"]
+    },
+    {
+      "id": "command_player_observation",
+      "priority": "P1",
+      "status": "copied_invocation_subset_available",
+      "requirements": ["Copy views when retention is needed", "Never reuse invocation tokens as player identity", "Do not infer Steam or Epic from numeric shape"],
+      "acceptance": ["Wrong owner, thread and stale invocation reject reads", "Nested callbacks cannot read an outer invocation", "Missing optional fields remain unavailable"]
+    },
+    {
+      "id": "player_lookup_sessions_and_readiness",
+      "priority": "P1",
+      "status": "lifecycle_observation_only",
+      "requirements": ["Copied online roster and explicit identifier namespaces", "Session invalidation on logout, reconnect and world replacement", "Separate readiness, observation and authenticated principal contracts"],
+      "acceptance": ["Steam and Epic tested independently", "Interrupted login never creates an invented authenticated principal", "Restart never revives process-local handles"]
+    },
+    {
+      "id": "console_rcon_permissions",
+      "priority": "P2",
+      "status": "no_public_service",
+      "requirements": ["Transport-authenticated copied command requests and results", "Explicit principal and role provenance", "Keep OS operator authority separate from player and plugin tokens"],
+      "acceptance": ["Unauthorized commands fail closed", "Same display name grants no authority", "Remote RCON is not confused with the local operator socket"]
+    },
+    {
+      "id": "native_hooks_and_policy",
+      "priority": "P2",
+      "status": "debug_process_event_and_observational_scalar_subset",
+      "requirements": ["Specify native event pre/post phase and original-call behavior", "Validate each supported build privately", "Add copied event or action contracts for selected plugin needs"],
+      "acceptance": ["Unsupported build disables the operation", "Native calls outside ProcessEvent are not silently treated as observed", "No observational field is used as return-override authority"]
+    },
+    {
+      "id": "persistent_storage_and_integrations",
+      "priority": "P2",
+      "status": "plugin_owned_storage_no_public_http_service",
+      "requirements": ["Versioned storage and explicit identity migration", "Transactions and retry/idempotency semantics", "Owned I/O cancellation and managed completion before unload"],
+      "acceptance": ["Partial migration can recover without losing existing data", "Reload cannot deliver an old HTTP completion into new code", "No process-local token is persisted as an account key"]
+    },
+    {
+      "id": "inventory_economy_actor_world_mutation",
+      "priority": "P3",
+      "status": "no_public_mutation_service",
+      "requirements": ["Implement only selected verified native game operations", "Authoritative identifiers and invalidatable resources", "Replay and duplication protection for grants, removal and currency changes"],
+      "acceptance": ["Invalid or stale targets cause no mutation", "Retry cannot duplicate a grant", "Real clients verify each resulting game action"]
+    }
+  ],
+  "port_record_required": ["Upstream commit and plugin license", "Native dependencies", "ArkApi calls", "Direct UE accesses", "Threads and external callbacks", "Availability decision for every required operation"]
+}

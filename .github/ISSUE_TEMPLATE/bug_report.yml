@@ -1,0 +1,18 @@
+name: Fallo
+description: Informa de un problema reproducible.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Revisión y entorno
+      placeholder: Commit o tag, versión de Node.js y distribución Linux
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Pasos, resultado observado y resultado esperado
+      description: Usa valores sintéticos en los ejemplos y registros.
+    validations:
+      required: true

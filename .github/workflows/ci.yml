@@ -1,0 +1,41 @@
+name: Arkmanager CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gateway:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: |
+          npm --prefix apps/flowark/client ci --ignore-scripts
+          npm --prefix apps/flowark/server ci --ignore-scripts
+          npm --prefix apps/flowark/client run lint
+          npm --prefix apps/flowark/client test
+          npm --prefix apps/flowark/client run build
+          npm --prefix apps/flowark/server test
+
+  panel:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/obelisk-panel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm test

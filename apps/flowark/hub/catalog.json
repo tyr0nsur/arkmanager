@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "product": "ObeliskNative Hub",
+  "stage": "experimental",
+  "game": "ARK: Survival Evolved",
+  "platform": "linux-x86_64",
+  "gameplay_parity_accepted": false,
+  "reference_catalog_is_installable": false,
+  "plugins": [
+    {
+      "id": "oPing",
+      "name": "Ping e identidad observada",
+      "version": "0.1.0-experimental.1",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Diagnóstico de chat y observaciones de la sesión",
+      "commands": [
+        "/ping",
+        "/whoami"
+      ],
+      "requirements": [
+        "Runtime ObeliskNative API 312 o posterior compatible con el ejecutable ASE verificado",
+        "Plugin cooperativo y configuración válida de la instancia"
+      ],
+      "limitations": [
+        "El ID nativo observado no autentica una cuenta Steam o Epic.",
+        "La aceptación de presentación privada y dos jugadores sigue pendiente."
+      ]
+    },
+    {
+      "id": "oEssentials",
+      "name": "Ayuda y reglas",
+      "version": "0.1.0-experimental.1",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Mensajes de ayuda configurables por servidor",
+      "commands": [
+        "/help [rules|motd|info]",
+        "/rules",
+        "/motd",
+        "/serverinfo"
+      ],
+      "requirements": [
+        "Runtime ObeliskNative API 312 o posterior compatible con el ejecutable ASE verificado",
+        "Plugin cooperativo y configuración válida de la instancia"
+      ],
+      "limitations": [
+        "Textos propios del operador; validación completa con Steam y Epic pendiente."
+      ]
+    },
+    {
+      "id": "oShopKits",
+      "name": "Tienda y kits",
+      "version": "0.1.0-experimental.1",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Catálogo informativo de productos y kits",
+      "commands": [
+        "/shop [pagina|id]",
+        "/kits [pagina|id]"
+      ],
+      "requirements": [
+        "Runtime ObeliskNative API 312 o posterior compatible con el ejecutable ASE verificado",
+        "Plugin cooperativo y configuración válida de la instancia"
+      ],
+      "limitations": [
+        "Compras, cobros y entregas de inventario no están habilitados.",
+        "Los recibos offline no certifican entregas dentro del juego."
+      ]
+    },
+    {
+      "id": "oHomes",
+      "name": "Homes de sesión",
+      "version": "0.1.0-experimental.1",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Puntos personales durante la sesión actual",
+      "commands": [
+        "/sethome <nombre>",
+        "/homes",
+        "/delhome <nombre>",
+        "/home <nombre>"
+      ],
+      "requirements": [
+        "Runtime ObeliskNative API 312 o posterior compatible con el ejecutable ASE verificado",
+        "Plugin cooperativo y configuración válida de la instancia"
+      ],
+      "limitations": [
+        "Los puntos se pierden al reconectar o recargar el plugin.",
+        "Viaje propio experimental; requiere activación del operador y prueba real dentro del juego."
+      ]
+    },
+    {
+      "id": "oAdvancedChat",
+      "name": "Chat avanzado",
+      "version": "0.1.0-experimental.1",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Mensajes globales y privados entre sesiones observadas",
+      "commands": [
+        "/chathelp",
+        "/chatlist [pagina]",
+        "/chatglobal <texto>",
+        "/tell <sesion> <texto>"
+      ],
+      "requirements": [
+        "Runtime ObeliskNative API 312 o posterior compatible con el ejecutable ASE verificado",
+        "Plugin cooperativo y configuración válida de la instancia"
+      ],
+      "limitations": [
+        "El listado incluye sesiones observadas y no es un censo autoritativo.",
+        "Destinatarios y aislamiento pendientes de confirmar con dos clientes reales."
+      ]
+    },
+    {
+      "id": "oWorldTools",
+      "name": "Consultas de mundo",
+      "version": "0.1.0-experimental.1",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Posición, tribu, montura y estructura apuntada",
+      "commands": [
+        "/whereami",
+        "/tribe",
+        "/dino",
+        "/structure"
+      ],
+      "requirements": [
+        "Runtime ObeliskNative API 312 o posterior compatible con el ejecutable ASE verificado",
+        "Plugin cooperativo y configuración válida de la instancia"
+      ],
+      "limitations": [
+        "Sólo lectura; no modifica dinos, tribus ni estructuras.",
+        "Las funciones nativas requieren aceptación con clientes Steam y Epic."
+      ]
+    },
+    {
+      "id": "oMonitor",
+      "name": "Monitor nativo del panel",
+      "version": "0.1.0",
+      "stage": "experimental",
+      "tier": "community",
+      "summary": "Métricas del proceso y eventos nativos hacia el panel del clúster",
+      "commands": [],
+      "requirements": [
+        "SDK con temporizadores y callbacks gestionados",
+        "Directorio privado y activación por instancia"
+      ],
+      "limitations": [
+        "El heartbeat del monitor no prueba que avance el hilo del juego.",
+        "El censo completo y TPS requieren bindings nativos adicionales.",
+        "Los IDs observados no autentican cuentas Steam o Epic."
+      ]
+    }
+  ]
+}

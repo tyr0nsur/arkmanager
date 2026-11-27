@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" role="img" aria-labelledby="flowark-favicon-title">
+  <title id="flowark-favicon-title">ObeliskNative</title>
+  <rect width="48" height="48" rx="10" fill="#64748b"/>
+  <path fill="#64748b" d="M25.9 44.3c-.7.9-2.2.4-2.2-.8V33.1a2.4 2.4 0 0 0-2.4-2.4H9.8c-1 0-1.5-1.1-1-1.9l7.6-10.7c1.1-1.5 0-3.7-1.9-3.7H2.6c-1 0-1.5-1.1-1-1.9L10.9.6c.2-.4.6-.6 1-.6h28.4c1 0 1.5 1.1 1 1.9l-7.6 10.7c-1.1 1.5 0 3.7 1.9 3.7h9.9c1 0 1.6 1.2.9 2L25.9 44.3Z"/>
+  <path fill="#64748b" fill-opacity=".9" d="M23.6 29.6 12.8 42.2h5.4c.8 0 1.5-.4 1.9-1l8.5-12.7c.5-.8 0-1.8-.9-1.8h-1.8c-.9 0-1.7.3-2.3.9Z"/>
+</svg>

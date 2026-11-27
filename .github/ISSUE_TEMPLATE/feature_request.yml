@@ -1,0 +1,10 @@
+name: Propuesta
+description: Describe una mejora para el proyecto.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Caso de uso y comportamiento esperado
+    validations:
+      required: true

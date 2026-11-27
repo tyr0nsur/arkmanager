@@ -1,0 +1,33 @@
+const test=require('node:test');const assert=require('node:assert/strict');const {io}=require('socket.io-client');const {startFixture}=require('./fixture.cjs');
+const headers={cookie:'session=fixture-owner; XSRF-TOKEN=fixture-csrf','x-txadmin-csrftoken':'fixture-csrf','x-obelisk-map':'island','content-type':'application/json'};
+const event=(socket,name)=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Timeout awaiting '+name)),6000);socket.once(name,data=>{clearTimeout(timer);resolve(data);});});
+test('txAdmin ARK host preserves auth, scopes map controls and rejects CSRF, unknown maps and viewer writes',async t=>{
+ const f=await startFixture();t.after(f.close);
+ const request=(route,method='GET',body,extra={})=>fetch(f.base+route,{method,headers:{...headers,...extra},...(body?{body:JSON.stringify(body)}:{})});
+ assert.equal((await fetch(f.base+'/auth/self')).status,401);
+ const boot=await (await request('/runtime/ark-bootstrap.js')).text();assert.match(boot,/ObeliskPanel/);assert.match(boot,/fixture-owner/);assert.doesNotMatch(boot,/fixture-owner-password/);
+ const denied=await request('/fxserver/controls','POST',{action:'restart'},{'x-txadmin-csrftoken':'wrong'});assert.equal(denied.status,403);
+ assert.equal((await request('/fxserver/controls','POST',{action:'start'},{'x-obelisk-map':'outside'})).status,400);
+ assert.equal((await request('/fxserver/controls','POST',{action:'start'},{cookie:'session=fixture-viewer; XSRF-TOKEN=fixture-csrf'})).status,403);
+ const result=await request('/fxserver/controls','POST',{action:'restart',mapId:'scorched'});assert.equal(result.status,200);
+ const save=f.state.commands.find(command=>command.command==='SaveWorld');assert.equal(save.mapId,'island');
+ const actual=f.state.calls.find(call=>call.path==='/api/server/action');assert.equal(actual.body.mapId,'island','body must never override the selected map');
+ assert.equal((await request('/ark/resources/action','POST',{id:'oMonitor',action:'pause'})).status,200);
+ assert.equal((await request('/api/admins','GET',null,{cookie:'session=fixture-viewer; XSRF-TOKEN=fixture-csrf'})).status,403);
+ assert.equal((await request('/api/hub/resources')).status,200,'existing SDK routes survive the source port');
+ assert.equal((await request('/ark/schedule','POST',{when:'+15'})).status,200);assert.equal(f.state.jobs[0].mapId,'island');
+ assert.ok(f.state.jobs[0].dueAt>Date.now()+14*60000);
+ const before=f.state.commands.length;
+ assert.equal((await request('/ark/cluster/action','POST',{mapIds:['island','outside'],action:'save'})).status,400);
+ assert.equal(f.state.commands.length,before,'all bulk targets must validate before any side effect');
+ const bulk=await request('/ark/cluster/action','POST',{mapIds:['island','scorched'],action:'save'});assert.equal(bulk.status,200);assert.deepEqual((await bulk.json()).results.map(item=>item.id),['island','scorched']);
+ assert.deepEqual(f.state.commands.slice(-2).map(item=>item.mapId),['island','scorched']);
+ assert.equal((await request('/ark/cluster/action','POST',{mapIds:['island'],action:'save'},{cookie:'session=fixture-viewer; XSRF-TOKEN=fixture-csrf'})).status,403);
+ const staticPage=await fetch(f.base+'/cluster');assert.equal(staticPage.status,200);assert.match(staticPage.headers.get('content-security-policy'),/script-src 'self'/);assert.match(await staticPage.text(),/ark-bootstrap/);assert.equal((await fetch(f.base+'/favicon_default.svg',{method:'HEAD'})).status,200);
+});
+test('original Socket.IO rooms receive real ARK channels and revoke sessions during a live connection',async t=>{
+ const f=await startFixture();t.after(f.close);
+ const socket=io(f.base,{path:'/socket.io',transports:['polling'],upgrade:false,extraHeaders:{cookie:headers.cookie},auth:{csrfToken:'fixture-csrf'},query:{rooms:'status,playerlist',instance:'scorched',uiVersion:'0.1.0-ark'}});t.after(()=>socket.disconnect());
+ const status=await event(socket,'status');assert.equal(status.ark.instance.id,'scorched');assert.equal(status.server.health,'ONLINE');assert.equal(status.ark.native.metrics.cpu_percent,27.5);
+ f.state.revoked=true;assert.equal(await event(socket,'logout'),'session_revoked');
+});
